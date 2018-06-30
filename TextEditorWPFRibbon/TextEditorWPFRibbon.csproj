@@ -162,5 +162,23 @@
   <ItemGroup>
     <Resource Include="Images\save.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Save.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Background1.ico" />
+    <Resource Include="Images\Background2.ico" />
+    <Resource Include="Images\Copy.ico" />
+    <Resource Include="Images\Cut.ico" />
+    <Resource Include="Images\Exit.ico" />
+    <Resource Include="Images\New.ico" />
+    <Resource Include="Images\Open.ico" />
+    <Resource Include="Images\Open2.ico" />
+    <Resource Include="Images\Paste.ico" />
+    <Resource Include="Images\Redo.ico" />
+    <Resource Include="Images\SaveAs.ico" />
+    <Resource Include="Images\Search.ico" />
+    <Resource Include="Images\Undo.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

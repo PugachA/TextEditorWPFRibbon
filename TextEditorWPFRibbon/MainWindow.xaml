@@ -6,7 +6,8 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:TextEditorWPFRibbon"
         mc:Ignorable="d"
-        Title="MainWindow" Height="550" Width="850">
+        Closing="DataWindow_Closing"
+        Title="MainWindow" Height="600" Width="850">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -15,25 +16,51 @@
         <Ribbon>
             <Ribbon.QuickAccessToolBar>
                 <RibbonQuickAccessToolBar Height="30">
-                    <RibbonButton SmallImageSource="/TextEditorWPFRibbon;component/Images/save.png"
-                                  KeyTip="1"/>
-                    <RibbonButton SmallImageSource="/TextEditorWPFRibbon;component/Images/Undo16.png"
+                    <RibbonButton x:Name="_buttonSave1"
+                                  Click="_buttonSave_Click"
+                                  SmallImageSource="/TextEditorWPFRibbon;component/Images/Save.ico"
+                                  KeyTip="1" Margin="0,0,0,2" />
+
+                    <RibbonButton SmallImageSource="/TextEditorWPFRibbon;component/Images/Undo.ico"
                                   Command="ApplicationCommands.Undo"
                                   KeyTip="2"/>
-                    <RibbonButton SmallImageSource="/TextEditorWPFRibbon;component/Images/Redo16.png"
+
+                    <RibbonButton SmallImageSource="/TextEditorWPFRibbon;component/Images/Redo.ico"
                                   Command="ApplicationCommands.Redo"
                                   KeyTip="3"/>
+
                 </RibbonQuickAccessToolBar>
             </Ribbon.QuickAccessToolBar>
             <Ribbon.ApplicationMenu>
                 <RibbonApplicationMenu Label="Файл">
-                    <RibbonApplicationMenuItem Header="Сохранить"/>
-                    <RibbonApplicationMenuItem Header="Сохранить как"/>
-                    <RibbonApplicationMenuItem Header="Открыть"/>
-                    <RibbonApplicationMenuItem Header="Создать"/>
-                    <RibbonApplicationMenuItem Header="Печать"/>
-                    <RibbonApplicationMenuItem Header="Справка"/>
-                    <RibbonApplicationMenuItem Header="Выход"/>
+                    <RibbonApplicationMenuItem x:Name="_buttonSave2"
+                                               Header="Сохранить"
+                                               Click="_buttonSave_Click" 
+                                               ImageSource="/TextEditorWPFRibbon;component/Images/Save.ico"/>
+
+                    <RibbonApplicationMenuItem x:Name="_buttonSaveAs"
+                                               Header="Сохранить как"
+                                               Click="_buttonSaveAs_Click"
+                                               ImageSource="/TextEditorWPFRibbon;component/Images/SaveAs.ico"/>
+
+                    <RibbonApplicationMenuItem x:Name="_buttonOpen"
+                                               Header="Открыть"
+                                               Click="_buttonOpen_Click"
+                                               ImageSource="/TextEditorWPFRibbon;component/Images/Open.ico"/>
+
+                    <RibbonApplicationMenuItem x:Name="_buttonNew"
+                                               Header="Создать"
+                                               Click="_buttonNew_Click"
+                                               ImageSource="/TextEditorWPFRibbon;component/Images/New.ico"/>
+
+                    <RibbonApplicationMenuItem x:Name="_buttonPrint"
+                                               Header="Печать"
+                                               Click="_buttonPrint_Click"/>
+
+                    <RibbonApplicationMenuItem x:Name="Exit" Header="Выход"
+                                               ImageSource="/TextEditorWPFRibbon;component/Images/Exit.ico"
+                                               Click="Exit_Click"/>
+                    
                     <!--               Вспомогательная панель.-->
                     <RibbonApplicationMenu.AuxiliaryPaneContent>
                         <TextBlock Text="Это вспомагательная панель"/>
@@ -49,19 +76,19 @@
                                   ToolTipDescription="Вставка содерживого буфера обмена в документ"/>
 
                     <RibbonButton Name="_buttonCopy" Label="Копировать"
-                                  SmallImageSource="/TextEditorWPFRibbon;component/Images/Copy16.png"
+                                  SmallImageSource="/TextEditorWPFRibbon;component/Images/Copy.ico"
                                   Command="ApplicationCommands.Copy"
                                   ToolTipTitle="Копировать (Сtrl+C)"
                                   ToolTipDescription="Помещение копии выделенного фрагмента в буфер обмена, чтобы её можно было вставить в другом месте"/>
 
                     <RibbonButton Name="_buttonCut" Label="Вырезать"
-                                  SmallImageSource="/TextEditorWPFRibbon;component/Images/Cut16.png"
+                                  SmallImageSource="/TextEditorWPFRibbon;component/Images/Cut.ico"
                                   Command="ApplicationCommands.Cut"
                                   ToolTipTitle="Вырезать (Сtrl+X)"
                                   ToolTipDescription="Удаление выделенного фрагмента и помещение его в буфер обмена, чтобы её можно было вставить в другом месте"/>
 
                     <RibbonButton Name="_buttonDelete" Label="Очистить"
-                                  SmallImageSource="/TextEditorWPFRibbon;component/Images/Delete16.png"
+                                  SmallImageSource="/TextEditorWPFRibbon;component/Images/Exit.ico"
                                   Command="EditingCommands.Delete"
                                   ToolTipTitle="Очистить"
                                   ToolTipDescription="Удаление выделенного фрагмента"/>
@@ -71,29 +98,30 @@
                                   Command="ApplicationCommands.SelectAll"
                                   ToolTipTitle="Выделить всё (Crtl+A)"
                                   ToolTipDescription="Выделение всего содерживого документа"/>
-                    
+
                 </RibbonGroup>
                 <RibbonGroup Header="Шрифт">
                     <RibbonControlGroup BorderBrush="#00000000">
                         <ComboBox Name="_fontFamily" IsEditable="True" Width="120"
                                   SelectionChanged="FontFamily_SelectionChanged"
-                                  StaysOpenOnEdit="True" 
+                                  StaysOpenOnEdit="True"
+                                  IsTextSearchEnabled="True"
+                                  PreviewMouseUp="_fontFamily_PreviewMouseUp"
                                   ToolTip="Выбор нового шрифта для текста"/>
-                        
-                        <ComboBox x:Name="_fontSize" IsEditable="True" Width="55"
+
+                        <ComboBox x:Name="_fontSize" IsEditable="True" Width="55" IsTextSearchEnabled="True"
                                   SelectionChanged="FontSize_SelectionChanged" 
+                                  PreviewMouseUp="_fontSize_PreviewMouseUp"
                                   ToolTip="Выбор нового размера шрифта для текста"/>
 
                         <RibbonSeparator Width="10" BorderBrush="#00000000"/>
-                        
+
                         <RibbonMenuButton Label="Aa"
                                           ToolTipTitle="Регистр"
                                           ToolTipDescription="Преобразование всех букв выделенного текста в прописные или строчные">
-                            <RibbonMenuItem Header="ПРИВЕДЕНИЕ В ВЕРХНЕМУ РЕГИСТРУ"/>
-                            <RibbonMenuItem Header="приведение к нижнему регистру"/>
+                            <RibbonMenuItem x:Name="Up" Header="ПРИВЕДЕНИЕ В ВЕРХНЕМУ РЕГИСТРУ" Click="Up_Click"/>
+                            <RibbonMenuItem x:Name="Low" Header="приведение к нижнему регистру" Click="Low_Click"/>
                         </RibbonMenuButton>
-
-
                     </RibbonControlGroup>
 
                     <RibbonControlGroup BorderBrush="#00000000">
@@ -116,23 +144,29 @@
                         <Label>
                             <Rectangle Height="30" Margin="2,0" Stroke="Silver"/>
                         </Label>
-                        
-                        <Label x:Name="_labelForeground" Content="A" Height="30" Width="20"
-                               FontSize="16"/>
+
+                        <StackPanel Height="25">
+                            <TextBlock Text=" A" FontSize="16" Height="20" Width="19" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="_labelForeground" Text="" Height="5"/>
+                        </StackPanel>
 
                         <xctk:ColorPicker x:Name="_colorPickerForeground" Width="40" Height="25" 
-                                          SelectedColorChanged="_colorPickerForeground_SelectedColorChanged">
+                                          SelectedColorChanged="_colorPickerForeground_SelectedColorChanged"
+                                          MouseUp="_colorPickerForeground_MouseUp">
                         </xctk:ColorPicker>
-                        
+
                         <Label>
                             <Rectangle Height="30" Margin="2,0" Stroke="Silver"/>
                         </Label>
 
-                        <Label x:Name="_labelBackground" Content="A" Background="White" Height="30" Width="20"
-                               FontSize="16"/>
-                        
+                        <StackPanel Height="25">
+                            <Image Source="/TextEditorWPFRibbon;component/Images/Background2.ico" Height="20" />
+                            <TextBlock x:Name="_labelBackground" Text="" Height="5"/>
+                        </StackPanel>
+
                         <xctk:ColorPicker Name="_colorPickerBackground" Width="40" Height="25"
-                                          SelectedColorChanged="_colorPickerBackground_SelectedColorChanged">
+                                          SelectedColorChanged="_colorPickerBackground_SelectedColorChanged"
+                                          MouseUp="_colorPickerBackground_MouseUp">
                         </xctk:ColorPicker>
 
                     </RibbonControlGroup>
@@ -140,10 +174,12 @@
                 <RibbonGroup Header="Абзац">
                     <RibbonControlGroup>
                         <RibbonToggleButton x:Name="_buttonNumbering"
+                                            Checked="_buttonNumbering_Checked"
                                            SmallImageSource="/TextEditorWPFRibbon;component/Images/Numbering16.png"
                                            Command="EditingCommands.ToggleNumbering"/>
 
-                        <RibbonToggleButton x:Name="_buttonBullets" 
+                        <RibbonToggleButton x:Name="_buttonBullets"
+                                            Checked="_buttonBullets_Checked"
                                            SmallImageSource="/TextEditorWPFRibbon;component/Images/Bullets16.png"
                                            Command="EditingCommands.ToggleBullets"/>
                     </RibbonControlGroup>
@@ -156,7 +192,7 @@
                                            SmallImageSource="/TextEditorWPFRibbon;component/Images/CenterAlign16.png"
                                            Command="EditingCommands.AlignCenter"/>
 
-                        <RibbonRadioButton x:Name="_buttonAlignRightr"  
+                        <RibbonRadioButton x:Name="_buttonAlignRight"  
                                            SmallImageSource="/TextEditorWPFRibbon;component/Images/RightAlign16.png"
                                            Command="EditingCommands.AlignRight"/>
 
@@ -170,6 +206,10 @@
                     <RibbonToggleButton x:Name="_spellcheck" 
                                                LargeImageSource="/TextEditorWPFRibbon;component/Images/spellcheck.png"
                                                Label="Правописание" FontSize="7"
+                                               ToolTipTitle="Правописание"
+                                               ToolTipDescription="Проверка орфографии в тексте документа"
+                                               Unchecked="_spellcheck_Unchecked" 
+                                               Checked="_spellcheck_Checked"
                                                Margin="10,0,-10,0">
                     </RibbonToggleButton>
                 </RibbonGroup>
@@ -181,7 +221,10 @@
                          Block.LineHeight="6" 
                          FontSize="14" 
                          Language="ru-ru"
-                         KeyDown="_richTextBox_KeyDown"/>
+                         KeyDown="_richTextBox_KeyDown"
+                         TextChanged="_richTextBox_TextChanged"
+                         SelectionChanged="_richTextBox_SelectionChanged">
+            </RichTextBox>
         </ScrollViewer>
     </Grid>
 
