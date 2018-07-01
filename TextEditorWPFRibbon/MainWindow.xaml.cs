@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-//using System.Windows.Shapes;
 using System.Windows.Controls.Primitives;
 using Microsoft.Win32;
 using System.IO;
@@ -35,12 +27,12 @@ namespace TextEditorWPFRibbon
         public MainWindow()
         {
             InitializeComponent();
-            this.Loaded += new RoutedEventHandler(MainWindow_Loaded);
+            this.Loaded += new RoutedEventHandler(MainWindow_Loaded); // выполняем метод MainWindow_Loaded при загрузке приложения
         }
 
         #region Properties
 
-        public double[] FontSizes
+        public double[] FontSizes //добавляем размеры шрифта
         {
             get
             {
@@ -54,6 +46,8 @@ namespace TextEditorWPFRibbon
             }
         }
         #endregion
+
+        #region Event Handlers
 
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -86,11 +80,6 @@ namespace TextEditorWPFRibbon
                 }
 
             }
-        }
-
-        private void _richTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            flag_change = true; //поднимаем флаг, потому что были изменения
         }
 
         private void FontFamily_SelectionChanged(object sender, SelectionChangedEventArgs e) //обработка выбора нового шрифта
@@ -143,6 +132,75 @@ namespace TextEditorWPFRibbon
             _richTextBox.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush((Color)e.NewValue));//изменение цвета фона текста 
             _colorPickerBackground.IsEnabled = false; //прошлось так сделать, чтобы после выбора цвета RTB становился активным (Ещё для этого добавлена обработки MouseUp)
         }
+
+        private void _fontSize_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            flag_FontSizeChange = true; //поднимаем флаг при нажатии мышки на Combobox
+        }
+
+        private void _fontFamily_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            flag_FontFamilyChange = true; //поднимаем флаг при нажатии мышки на Combobox
+        }
+
+        private void _spellcheck_Unchecked(object sender, RoutedEventArgs e)
+        {
+            _richTextBox.SpellCheck.IsEnabled = false;//включение проверки орфографии
+        }
+
+        private void _spellcheck_Checked(object sender, RoutedEventArgs e)
+        {
+            _richTextBox.SpellCheck.IsEnabled = true; //включение проверки орфографии
+        }
+
+        private void _buttonBullets_Checked(object sender, RoutedEventArgs e)
+        {
+            _buttonNumbering.IsChecked = false; //чтобы был активен только один формат списка
+        }
+
+        private void _buttonNumbering_Checked(object sender, RoutedEventArgs e)
+        {
+            _buttonBullets.IsChecked = false; //чтобы был активен только один формат списка
+        }
+
+        private void Low_Click(object sender, RoutedEventArgs e)
+        {
+            _richTextBox.Selection.Text = _richTextBox.Selection.Text.ToLower(); //приведение к нижнему регистру
+        }
+
+        private void Up_Click(object sender, RoutedEventArgs e)
+        {
+            _richTextBox.Selection.Text = _richTextBox.Selection.Text.ToUpper(); //приведение к верхнему регистру
+        }
+
+        private void _colorPickerForeground_MouseUp(object sender, MouseButtonEventArgs e) //Возникает при освобождении кнопки мыши
+        {
+            _colorPickerForeground.IsEnabled = true;
+        }
+
+        private void _colorPickerBackground_MouseUp(object sender, MouseButtonEventArgs e) //Возникает при освобождении кнопки мыши
+        {
+            _colorPickerBackground.IsEnabled = true;
+        }
+
+        private void Exit_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void _richTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            flag_change = true; //поднимаем флаг, потому что были изменения
+        }
+
+        private void _richTextBox_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            UpdateVisualState(); //обновляем состояние всех элементов отображения информации о тексте 
+        }
+
+        #endregion
+
+        #region Document Processing
 
         private void _buttonSave_Click(object sender, RoutedEventArgs e)
         {
@@ -315,129 +373,12 @@ namespace TextEditorWPFRibbon
             }
         }
 
-        private void Exit_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-        private void _richTextBox_SelectionChanged(object sender, RoutedEventArgs e)
-        {
-            UpdateVisualState();
-        }
-
-        private void UpdateVisualState() //метод для визуального отображения настроек текста
-        {
-            UpdateToggleButtonState();
-            UpdateSelectedFontFamily();
-            UpdateSelectedFontSize();
-            UpdateSelectionListType();
-        }
-
-        private void UpdateToggleButtonState() //обновление состояний  всех ToggleButtons
-        {
-            UpdateItemCheckedState(_buttonBold, TextElement.FontWeightProperty, FontWeights.Bold);
-            UpdateItemCheckedState(_buttonItalic, TextElement.FontStyleProperty, FontStyles.Italic);
-            UpdateItemCheckedState(_buttonUnderline, Inline.TextDecorationsProperty, TextDecorations.Underline);
-
-            UpdateItemCheckedState(_buttonAlignLeft, Paragraph.TextAlignmentProperty, TextAlignment.Left);
-            UpdateItemCheckedState(_buttonAlignCenter, Paragraph.TextAlignmentProperty, TextAlignment.Center);
-            UpdateItemCheckedState(_buttonAlignRight, Paragraph.TextAlignmentProperty, TextAlignment.Right);
-            UpdateItemCheckedState(_buttonAlignJustify, Paragraph.TextAlignmentProperty, TextAlignment.Right);
-        }
-
-        private void UpdateItemCheckedState(ToggleButton button, DependencyProperty formattingProperty, object expectedValue) // метод для обновления состояния ToggleButton
-        {
-            object currentValue = _richTextBox.Selection.GetPropertyValue(formattingProperty);
-            button.IsChecked = (currentValue == DependencyProperty.UnsetValue) ? false : currentValue != null && currentValue.Equals(expectedValue);
-        }
-
-        private void _colorPickerForeground_MouseUp(object sender, MouseButtonEventArgs e) //Возникает при освобождении кнопки мыши
-        {
-            _colorPickerForeground.IsEnabled = true;
-        }
-
-        private void _colorPickerBackground_MouseUp(object sender, MouseButtonEventArgs e) //Возникает при освобождении кнопки мыши
-        {
-            _colorPickerBackground.IsEnabled = true;
-        }
-
-        private void UpdateSelectedFontFamily() //проверить условие
-        {
-            object value = _richTextBox.Selection.GetPropertyValue(TextElement.FontFamilyProperty);
-            FontFamily currentFontFamily = (FontFamily)((value == DependencyProperty.UnsetValue) ? null : value);
-            if (currentFontFamily != null)
-            {
-                _fontFamily.SelectedItem = currentFontFamily; //выводим в Combobox шрифт текста
-                flag_FontFamilyChange = false; // опускаем флаг, чтобы выведенное значение не применялось к тексту.
-            }
-        }
-
-        private void UpdateSelectedFontSize()
-        {
-            object value = _richTextBox.Selection.GetPropertyValue(TextElement.FontSizeProperty);
-            _fontSize.SelectedValue = (value == DependencyProperty.UnsetValue) ? null : value; //выводим в Combobox  размер шрифта текста
-            flag_FontSizeChange = false; // опускаем флаг, чтобы выведенное значение не применялось к тексту.
-        }
-
-        private void _fontSize_PreviewMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            flag_FontSizeChange = true; //поднимаем флаг при нажатии мышки на Combobox
-        }
-
-        private void _fontFamily_PreviewMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            flag_FontFamilyChange = true; //поднимаем флаг при нажатии мышки на Combobox
-        }
-
-        private void _spellcheck_Unchecked(object sender, RoutedEventArgs e)
-        {
-            _richTextBox.SpellCheck.IsEnabled = false;//включение проверки орфографии
-        }
-
-        private void _spellcheck_Checked(object sender, RoutedEventArgs e)
-        {
-            _richTextBox.SpellCheck.IsEnabled = true; //включение проверки орфографии
-        }
-
-        private void UpdateSelectionListType() //обновления формата списка
-        {
-            Paragraph startParagraph = _richTextBox.Selection.Start.Paragraph;
-            Paragraph endParagraph = _richTextBox.Selection.End.Paragraph;
-            if (startParagraph != null && endParagraph != null && (startParagraph.Parent is ListItem) && (endParagraph.Parent is ListItem) && object.ReferenceEquals(((ListItem)startParagraph.Parent).List, ((ListItem)endParagraph.Parent).List))
-            {
-                TextMarkerStyle markerStyle = ((ListItem)startParagraph.Parent).List.MarkerStyle;
-                if (markerStyle == TextMarkerStyle.Disc) //bullets
-                {
-                    _buttonBullets.IsChecked = true;
-                }
-                else if (markerStyle == TextMarkerStyle.Decimal) //numbers
-                {
-                    _buttonNumbering.IsChecked = true;
-                }
-            }
-            else
-            {
-                _buttonBullets.IsChecked = false;
-                _buttonNumbering.IsChecked = false;
-            }
-        }
-
-        private void _buttonBullets_Checked(object sender, RoutedEventArgs e)
-        {
-            _buttonNumbering.IsChecked = false; 
-        }
-
-        private void _buttonNumbering_Checked(object sender, RoutedEventArgs e)
-        {
-            _buttonBullets.IsChecked = false;
-        }
-
         private void _buttonPrint_Click(object sender, RoutedEventArgs e)
         {
             PrintDialog pd = new PrintDialog();
             if ((pd.ShowDialog() == true))
             {
- 
+
                 FlowDocument doc = _richTextBox.Document;
 
                 // Сохраняем все имеющиеся настройки
@@ -467,14 +408,77 @@ namespace TextEditorWPFRibbon
             }
         }
 
-        private void Low_Click(object sender, RoutedEventArgs e)
+        #endregion
+
+        #region Methods
+
+        private void UpdateVisualState() //метод для визуального отображения настроек текста
         {
-            _richTextBox.Selection.Text = _richTextBox.Selection.Text.ToUpper();
+            UpdateToggleButtonState();
+            UpdateSelectedFontFamily();
+            UpdateSelectedFontSize();
+            UpdateSelectionListType();
         }
 
-        private void Up_Click(object sender, RoutedEventArgs e)
+        private void UpdateToggleButtonState() //обновление состояний  всех ToggleButtons
         {
-            _richTextBox.Selection.Text = _richTextBox.Selection.Text.ToUpper();
+            UpdateItemCheckedState(_buttonBold, TextElement.FontWeightProperty, FontWeights.Bold);
+            UpdateItemCheckedState(_buttonItalic, TextElement.FontStyleProperty, FontStyles.Italic);
+            UpdateItemCheckedState(_buttonUnderline, Inline.TextDecorationsProperty, TextDecorations.Underline);
+
+            UpdateItemCheckedState(_buttonAlignLeft, Paragraph.TextAlignmentProperty, TextAlignment.Left);
+            UpdateItemCheckedState(_buttonAlignCenter, Paragraph.TextAlignmentProperty, TextAlignment.Center);
+            UpdateItemCheckedState(_buttonAlignRight, Paragraph.TextAlignmentProperty, TextAlignment.Right);
+            UpdateItemCheckedState(_buttonAlignJustify, Paragraph.TextAlignmentProperty, TextAlignment.Right);
         }
+
+        private void UpdateItemCheckedState(ToggleButton button, DependencyProperty formattingProperty, object expectedValue) // метод для обновления состояния ToggleButton
+        {
+            object currentValue = _richTextBox.Selection.GetPropertyValue(formattingProperty);
+            button.IsChecked = (currentValue == DependencyProperty.UnsetValue) ? false : currentValue != null && currentValue.Equals(expectedValue);
+        }
+
+        private void UpdateSelectedFontFamily() //проверить условие
+        {
+            object value = _richTextBox.Selection.GetPropertyValue(TextElement.FontFamilyProperty);
+            FontFamily currentFontFamily = (FontFamily)((value == DependencyProperty.UnsetValue) ? null : value);
+            if (currentFontFamily != null)
+            {
+                _fontFamily.SelectedItem = currentFontFamily; //выводим в Combobox шрифт текста
+                flag_FontFamilyChange = false; // опускаем флаг, чтобы выведенное значение не применялось к тексту.
+            }
+        }
+
+        private void UpdateSelectedFontSize()
+        {
+            object value = _richTextBox.Selection.GetPropertyValue(TextElement.FontSizeProperty);
+            _fontSize.SelectedValue = (value == DependencyProperty.UnsetValue) ? null : value; //выводим в Combobox  размер шрифта текста
+            flag_FontSizeChange = false; // опускаем флаг, чтобы выведенное значение не применялось к тексту.
+        }
+
+        private void UpdateSelectionListType() //обновления формата списка
+        {
+            Paragraph startParagraph = _richTextBox.Selection.Start.Paragraph;
+            Paragraph endParagraph = _richTextBox.Selection.End.Paragraph;
+            if (startParagraph != null && endParagraph != null && (startParagraph.Parent is ListItem) && (endParagraph.Parent is ListItem) && object.ReferenceEquals(((ListItem)startParagraph.Parent).List, ((ListItem)endParagraph.Parent).List))
+            {
+                TextMarkerStyle markerStyle = ((ListItem)startParagraph.Parent).List.MarkerStyle;
+                if (markerStyle == TextMarkerStyle.Disc) //bullets
+                {
+                    _buttonBullets.IsChecked = true;
+                }
+                else if (markerStyle == TextMarkerStyle.Decimal) //numbers
+                {
+                    _buttonNumbering.IsChecked = true;
+                }
+            }
+            else
+            {
+                _buttonBullets.IsChecked = false;
+                _buttonNumbering.IsChecked = false;
+            }
+        }
+
+        #endregion
     }
 }

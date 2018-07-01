@@ -122,58 +122,33 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\up.jpg" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\Bold16.png" />
     <Resource Include="Images\Bullets16.png" />
     <Resource Include="Images\CenterAlign16.png" />
-    <Resource Include="Images\Copy16.png" />
-    <Resource Include="Images\Cut16.png" />
-    <Resource Include="Images\Delete16.png" />
     <Resource Include="Images\Italic16.png" />
     <Resource Include="Images\JustifyAlign16.png" />
     <Resource Include="Images\LeftAlign16.png" />
     <Resource Include="Images\Numbering16.png" />
     <Resource Include="Images\Paste32.png" />
-    <Resource Include="Images\Redo16.png" />
     <Resource Include="Images\RightAlign16.png" />
     <Resource Include="Images\Underline16.png" />
-    <Resource Include="Images\Undo16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\Low.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\UpLow.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\UpLow.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\UpLow.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\UL.PNG" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\spellcheck.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\save.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\Save.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\Background1.ico" />
     <Resource Include="Images\Background2.ico" />
     <Resource Include="Images\Copy.ico" />
     <Resource Include="Images\Cut.ico" />
     <Resource Include="Images\Exit.ico" />
     <Resource Include="Images\New.ico" />
     <Resource Include="Images\Open.ico" />
-    <Resource Include="Images\Open2.ico" />
     <Resource Include="Images\Paste.ico" />
     <Resource Include="Images\Redo.ico" />
     <Resource Include="Images\SaveAs.ico" />
