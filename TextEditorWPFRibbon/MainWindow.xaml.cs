@@ -480,5 +480,50 @@ namespace TextEditorWPFRibbon
         }
 
         #endregion
+
+        private void _textBoxSearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string searchText = _textBoxSearch.Text;
+            /*if(searchText != null)
+            {
+                TextRange text = new TextRange(_richTextBox.Document.ContentStart, _richTextBox.Document.ContentEnd); //создаем контейнер для документа
+                int index = text.Text.IndexOf(searchText);
+                //MessageBoxResult result1 = MessageBox.Show(index.ToString());
+                if (index >= 0)
+                {
+
+                    TextPointer textPoint = _richTextBox.Document.ContentStart;
+                    TextPointer start = textPoint.GetPositionAtOffset(index+2);
+                    TextPointer end = textPoint.GetPositionAtOffset(index + searchText.Length+2);
+                    TextRange textR = new TextRange(start, end);
+                    //MessageBoxResult result = MessageBox.Show(textR.Text);
+                    textR.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush(Colors.Yellow));
+                }*/
+            for (TextPointer position = _richTextBox.Document.ContentStart;
+    position != null && position.CompareTo(_richTextBox.Document.ContentEnd) <= 0;
+    position = position.GetNextContextPosition(LogicalDirection.Forward))
+            {
+                if (position.CompareTo(_richTextBox.Document.ContentEnd) == 0)
+                {
+                    //return _richTextBox.Document;
+                }
+
+                string textRun = position.GetTextInRun(LogicalDirection.Forward);
+                //StringComparison stringComparison = StringComparison.CurrentCulture;
+                int indexInRun = textRun.IndexOf(searchText);
+                if (indexInRun >= 0)
+                {
+                    position = position.GetPositionAtOffset(indexInRun);
+                    if (position != null)
+                    {
+                        TextPointer nextPointer = position.GetPositionAtOffset(searchText.Length);
+                        TextRange textRange = new TextRange(position, nextPointer);
+                        textRange.ApplyPropertyValue(TextElement.BackgroundProperty,
+                                      new SolidColorBrush(Colors.Yellow));
+                    }
+                }
+            }
+
+        }
     }
 }

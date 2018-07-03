@@ -213,6 +213,12 @@
                                                Margin="10,0,-10,0">
                     </RibbonToggleButton>
                 </RibbonGroup>
+                <RibbonGroup Width="130" Header="Поиск">
+                    <StackPanel Orientation="Horizontal">
+                        <RibbonTextBox x:Name="_textBoxSearch" TextChanged="_textBoxSearch_TextChanged"></RibbonTextBox>
+                        <RibbonButton x:Name="_buttonDeleteSearch" Height="22" Width="22" SmallImageSource="/TextEditorWPFRibbon;component/Images/Exit.ico"></RibbonButton>
+                    </StackPanel>
+                </RibbonGroup>
             </RibbonTab>
         </Ribbon>
         <ScrollViewer Grid.Row="1">
