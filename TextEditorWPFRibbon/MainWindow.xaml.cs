@@ -23,6 +23,9 @@ namespace TextEditorWPFRibbon
         bool flag_FontSizeChange = false; //нужен
         bool flag_FontFamilyChange = false; //флаг для отслеживание выбора стиля шрифта
         bool flag_KeyF7 = true; // флаг для обработки нажатия F7 
+        bool flag_Search = false; //флаг был ли поиск или нет
+        bool flag_SearchResult = true; //флаг для проверки результатов поиска, нашли что-то или нет
+        string lastSearchText = ""; // храним слово предыдущего поиска
 
         public MainWindow()
         {
@@ -104,6 +107,7 @@ namespace TextEditorWPFRibbon
         //функция для вызова действи при зажатии комбинации клавиш F7
         private void _richTextBox_KeyDown(object sender, KeyEventArgs e)
         {
+            //нажатие F7
             if (e.Key == Key.F7)
             {
                 if (flag_KeyF7)
@@ -117,6 +121,16 @@ namespace TextEditorWPFRibbon
                     flag_KeyF7 = true;
                 }
             }
+
+            //нажатие Ctrl+F
+            if (e.KeyboardDevice.Modifiers == ModifierKeys.Control && e.Key == Key.F)
+            {
+                _textBoxSearch.Focus();
+                _labelSearchResult.Content = "Введите текст для поиска";
+                _labelSearchResult.FontSize = 10;
+                _labelSearchResult.Foreground = new SolidColorBrush(Colors.Red);
+            }
+
         }
 
         private void _colorPickerForeground_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color?> e)
@@ -188,9 +202,56 @@ namespace TextEditorWPFRibbon
             this.Close();
         }
 
+        private void _buttonSearch_Click(object sender, RoutedEventArgs e)
+        {
+            string searchText = _textBoxSearch.Text.ToLower(); //искомый текст
+            if (searchText == "") //если пользователь ничего не ввёл, но хочет искать
+            {
+                _labelSearchResult.Content = "Необходимо заполнить\n поле для поиска";
+                _labelSearchResult.FontSize = 10;
+                _labelSearchResult.Foreground = new SolidColorBrush(Colors.Red);
+            }
+            else
+            {
+                flag_SearchResult = false;
+                SearchText(searchText, new SolidColorBrush(Colors.Orange));// ищем и выделяем текст
+                flag_Search = true; //искали, значит поднимаем флаг
+
+                if (flag_SearchResult == false) //если ничего не нашли
+                {
+                    _labelSearchResult.Content = "Результатов не найдено";
+                    _labelSearchResult.FontSize = 10;
+                    _labelSearchResult.Foreground = new SolidColorBrush(Colors.Red);
+                }
+
+            }
+        }
+
+        private void _buttonDeleteSearch_Click(object sender, RoutedEventArgs e)
+        {
+            SearchText(lastSearchText, new SolidColorBrush(Colors.White));// убираем выделение найденного текста
+            _labelSearchResult.Content = "";
+            _textBoxSearch.Clear();
+        }
+
+        private void _textBoxSearch_TextChanged(object sender, TextChangedEventArgs e) //обработка изменения текста в textbox
+        {
+            _labelSearchResult.Content = ""; //очищаем label
+            if (flag_Search) // если уже производился поиск то нужно убрать выделение
+            {
+                SearchText(lastSearchText, new SolidColorBrush(Colors.White)); //убираем выделение
+                flag_Search = false; //опускаем флаг
+            }
+        }
+
         private void _richTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             flag_change = true; //поднимаем флаг, потому что были изменения
+            if (flag_Search) //если что то искал, а потом начали опять работать в RTB
+            {
+                SearchText(lastSearchText, new SolidColorBrush(Colors.White)); //убираем выделение текста
+                flag_Search = false;
+            }
         }
 
         private void _richTextBox_SelectionChanged(object sender, RoutedEventArgs e)
@@ -479,51 +540,30 @@ namespace TextEditorWPFRibbon
             }
         }
 
-        #endregion
-
-        private void _textBoxSearch_TextChanged(object sender, TextChangedEventArgs e)
+        private void SearchText(string searchText, SolidColorBrush SelectionColor) //метод для поиска текста в документе и выделении его
         {
-            string searchText = _textBoxSearch.Text;
-            /*if(searchText != null)
-            {
-                TextRange text = new TextRange(_richTextBox.Document.ContentStart, _richTextBox.Document.ContentEnd); //создаем контейнер для документа
-                int index = text.Text.IndexOf(searchText);
-                //MessageBoxResult result1 = MessageBox.Show(index.ToString());
-                if (index >= 0)
-                {
-
-                    TextPointer textPoint = _richTextBox.Document.ContentStart;
-                    TextPointer start = textPoint.GetPositionAtOffset(index+2);
-                    TextPointer end = textPoint.GetPositionAtOffset(index + searchText.Length+2);
-                    TextRange textR = new TextRange(start, end);
-                    //MessageBoxResult result = MessageBox.Show(textR.Text);
-                    textR.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush(Colors.Yellow));
-                }*/
+            lastSearchText = searchText; //запоминаем текст который будет искать, чтобы потом убрать выделение
             for (TextPointer position = _richTextBox.Document.ContentStart;
-    position != null && position.CompareTo(_richTextBox.Document.ContentEnd) <= 0;
-    position = position.GetNextContextPosition(LogicalDirection.Forward))
+                position.CompareTo(_richTextBox.Document.ContentEnd) < 0;
+                position = position.GetNextContextPosition(LogicalDirection.Forward)) //запускаем цикл который пройдётся по всем символам документа 
             {
-                if (position.CompareTo(_richTextBox.Document.ContentEnd) == 0)
+                string textRun = position.GetTextInRun(LogicalDirection.Forward); //возвратит нам строку, содержащую текст рядом с текущим TextPointer в указанном логическом направлении.
+                int indexInRun = textRun.IndexOf(searchText); //находим индекс первого вхождения строки
+                if (indexInRun >= 0) // если нашли вхождение
                 {
-                    //return _richTextBox.Document;
-                }
-
-                string textRun = position.GetTextInRun(LogicalDirection.Forward);
-                //StringComparison stringComparison = StringComparison.CurrentCulture;
-                int indexInRun = textRun.IndexOf(searchText);
-                if (indexInRun >= 0)
-                {
-                    position = position.GetPositionAtOffset(indexInRun);
-                    if (position != null)
+                    position = position.GetPositionAtOffset(indexInRun); //смещаем TextPointer на указанное значение
+                    if (position != null) //проверка
                     {
-                        TextPointer nextPointer = position.GetPositionAtOffset(searchText.Length);
-                        TextRange textRange = new TextRange(position, nextPointer);
-                        textRange.ApplyPropertyValue(TextElement.BackgroundProperty,
-                                      new SolidColorBrush(Colors.Yellow));
+                        TextPointer nextPointer = position.GetPositionAtOffset(searchText.Length);//смещаем TextPointer на указанное значение, чтобы как раз получить конец вхождения
+                        TextRange textRange = new TextRange(position, nextPointer); // выделяем содержимое между TextPointer в TextRange, то есть искомый текст
+                        textRange.ApplyPropertyValue(TextElement.BackgroundProperty, SelectionColor);//меняем цвет фона искомого текста
+                        flag_SearchResult = true;// поднимаем флаг то что был поиск
                     }
                 }
             }
-
         }
+
+        #endregion
+
     }
 }

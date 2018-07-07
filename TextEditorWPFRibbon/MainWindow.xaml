@@ -60,7 +60,7 @@
                     <RibbonApplicationMenuItem x:Name="Exit" Header="Выход"
                                                ImageSource="/TextEditorWPFRibbon;component/Images/Exit.ico"
                                                Click="Exit_Click"/>
-                    
+
                     <!--               Вспомогательная панель.-->
                     <RibbonApplicationMenu.AuxiliaryPaneContent>
                         <TextBlock Text="Это вспомагательная панель"/>
@@ -127,16 +127,22 @@
                     <RibbonControlGroup BorderBrush="#00000000">
                         <RibbonToggleButton x:Name="_buttonBold" 
                                                SmallImageSource="/TextEditorWPFRibbon;component/Images/Bold16.png" 
+                                               ToolTipTitle="Жирный (Ctrl+B)"
+                                               ToolTipDescription="Применение жирного начертания к выделенному тексту"
                                                Command="EditingCommands.ToggleBold">
                         </RibbonToggleButton>
 
                         <RibbonToggleButton x:Name="_buttonItalic" 
-                                               SmallImageSource="/TextEditorWPFRibbon;component/Images/Italic16.png" 
+                                               SmallImageSource="/TextEditorWPFRibbon;component/Images/Italic16.png"
+                                               ToolTipTitle="Курсив (Ctrl+I)"
+                                               ToolTipDescription="Применение курсивного начертания к выделенному тексту"
                                                Command="EditingCommands.ToggleItalic">
                         </RibbonToggleButton>
 
                         <RibbonToggleButton x:Name="_buttonUnderline" 
                                                SmallImageSource="/TextEditorWPFRibbon;component/Images/Underline16.png" 
+                                               ToolTipTitle="Подчеркнутый (Ctrl+U)"
+                                               ToolTipDescription="Подчеркивание выделенного текста"
                                                Command="EditingCommands.ToggleUnderline">
                         </RibbonToggleButton>
 
@@ -145,9 +151,9 @@
                             <Rectangle Height="30" Margin="2,0" Stroke="Silver"/>
                         </Label>
 
-                        <StackPanel Height="25">
+                        <StackPanel Height="25" ToolTip="Цвет шрифта">
                             <TextBlock Text=" A" FontSize="16" Height="20" Width="19" HorizontalAlignment="Center"/>
-                            <TextBlock x:Name="_labelForeground" Text="" Height="5"/>
+                            <TextBlock x:Name="_labelForeground" Text="" Height="5" Background="Black"/>
                         </StackPanel>
 
                         <xctk:ColorPicker x:Name="_colorPickerForeground" Width="40" Height="25" 
@@ -159,7 +165,7 @@
                             <Rectangle Height="30" Margin="2,0" Stroke="Silver"/>
                         </Label>
 
-                        <StackPanel Height="25">
+                        <StackPanel Height="25" ToolTip="Цвет фона шрифта">
                             <Image Source="/TextEditorWPFRibbon;component/Images/Background2.ico" Height="20" />
                             <TextBlock x:Name="_labelBackground" Text="" Height="5"/>
                         </StackPanel>
@@ -175,29 +181,41 @@
                     <RibbonControlGroup>
                         <RibbonToggleButton x:Name="_buttonNumbering"
                                             Checked="_buttonNumbering_Checked"
-                                           SmallImageSource="/TextEditorWPFRibbon;component/Images/Numbering16.png"
-                                           Command="EditingCommands.ToggleNumbering"/>
+                                            SmallImageSource="/TextEditorWPFRibbon;component/Images/Numbering16.png"
+                                            ToolTipTitle="Нумерация"
+                                            ToolTipDescription="Начало нумерованного списка"
+                                            Command="EditingCommands.ToggleNumbering" VerticalAlignment="Top"/>
 
                         <RibbonToggleButton x:Name="_buttonBullets"
                                             Checked="_buttonBullets_Checked"
-                                           SmallImageSource="/TextEditorWPFRibbon;component/Images/Bullets16.png"
-                                           Command="EditingCommands.ToggleBullets"/>
+                                            SmallImageSource="/TextEditorWPFRibbon;component/Images/Bullets16.png"
+                                            ToolTipTitle="Маркеры"
+                                            ToolTipDescription="Начало маркированного списка"
+                                            Command="EditingCommands.ToggleBullets"/>
                     </RibbonControlGroup>
                     <RibbonControlGroup>
                         <RibbonRadioButton x:Name="_buttonAlignLeft" BorderBrush="#00000000"
                                            SmallImageSource="/TextEditorWPFRibbon;component/Images/LeftAlign16.png"
+                                           ToolTipTitle="Выровнять текст по левому краю (Ctrl+L)"
+                                           ToolTipDescription="Выравнивание текста по левому краю"
                                            Command="EditingCommands.AlignLeft"/>
 
                         <RibbonRadioButton x:Name="_buttonAlignCenter" 
                                            SmallImageSource="/TextEditorWPFRibbon;component/Images/CenterAlign16.png"
+                                           ToolTipTitle="Выровнять текст по центру (Ctrl+E)"
+                                           ToolTipDescription="Выравнивание текста по центру"
                                            Command="EditingCommands.AlignCenter"/>
 
                         <RibbonRadioButton x:Name="_buttonAlignRight"  
                                            SmallImageSource="/TextEditorWPFRibbon;component/Images/RightAlign16.png"
+                                           ToolTipTitle="Выровнять ткст по правому краю (Ctrl+R)"
+                                           ToolTipDescription="Выравнивание текста по правому краю"
                                            Command="EditingCommands.AlignRight"/>
 
                         <RibbonRadioButton x:Name="_buttonAlignJustify"
                                            SmallImageSource="/TextEditorWPFRibbon;component/Images/JustifyAlign16.png"
+                                           ToolTipTitle="Выровнять ткст по ширине (Ctrl+J)"
+                                           ToolTipDescription="Выравнивание текста одновременно по левому и правому краю за счет добавления дополнительный интервалов между словами там, где это необходимо"
                                            Command="EditingCommands.AlignJustify"/>
                     </RibbonControlGroup>
 
@@ -213,11 +231,21 @@
                                                Margin="10,0,-10,0">
                     </RibbonToggleButton>
                 </RibbonGroup>
-                <RibbonGroup Width="130" Header="Поиск">
+                <RibbonGroup Width="150" Header="Поиск">
                     <StackPanel Orientation="Horizontal">
                         <RibbonTextBox x:Name="_textBoxSearch" TextChanged="_textBoxSearch_TextChanged"></RibbonTextBox>
-                        <RibbonButton x:Name="_buttonDeleteSearch" Height="22" Width="22" SmallImageSource="/TextEditorWPFRibbon;component/Images/Exit.ico"></RibbonButton>
+                        <RibbonButton x:Name="_buttonSearch" Height="22" Width="22"
+                                      SmallImageSource="/TextEditorWPFRibbon;component/Images/Search.ico"
+                                      ToolTipTitle="Поиск (Ctrl + F)"
+                                      ToolTipDescription="Поиск текста в документе"
+                                      Click="_buttonSearch_Click"></RibbonButton>
+
+                        <RibbonButton x:Name="_buttonDeleteSearch" Height="22" Width="22"
+                                      SmallImageSource="/TextEditorWPFRibbon;component/Images/Exit.ico"
+                                      Click="_buttonDeleteSearch_Click"></RibbonButton>
                     </StackPanel>
+
+                    <Label x:Name="_labelSearchResult" Width="135" Height="42" FontSize="10"></Label>
                 </RibbonGroup>
             </RibbonTab>
         </Ribbon>
